@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>QR بازیکنان مافیا</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; direction: rtl; }
+    .player {
+      display: inline-block;
+      width: 180px;
+      margin: 15px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+    }
+    .qr {
+      margin: 10px 0;
+    }
+    .print-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="print-button" onclick="window.print()">🖨 چاپ QR همه بازیکنان</button>
+  <h1>QR بازیکنان بازی مافیا</h1>
+  <div id="players"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script>
+    // این لیست باید از سرور گرفته شود — فعلاً دستی می‌نویسیم
+    const players = [
+      { number: 1, qrId: "qr_player_1" },
+      { number: 2, qrId: "qr_player_2" },
+      { number: 3, qrId: "qr_player_3" },
+      { number: 4, qrId: "qr_player_4" },
+      { number: 5, qrId: "qr_player_5" },
+      { number: 6, qrId: "qr_player_6" },
+      { number: 7, qrId: "qr_player_7" },
+      { number: 8, qrId: "qr_player_8" },
+      { number: 9, qrId: "qr_player_9" },
+      { number: 10, qrId: "qr_player_10" },
+      { number: 11, qrId: "qr_player_11" },
+      { number: 12, qrId: "qr_player_12" },
+      { number: 13, qrId: "qr_player_13" },
+      { number: 14, qrId: "qr_player_14" },
+      { number: 15, qrId: "qr_player_15" }
+    ];
+
+    const container = document.getElementById('players');
+
+    players.forEach(player => {
+      const div = document.createElement('div');
+      div.className = 'player';
+      div.innerHTML = `
+        <h3>بازیکن شماره ${player.number}</h3>
+        <div class="qr" id="qr-${player.number}"></div>
+        <div style="font-size: 12px;">کد: ${player.qrId}</div>
+      `;
+      container.appendChild(div);
+
+      const url = `https://yourdomain.com/player/${player.qrId}`;
+      QRCode.toCanvas(document.getElementById(`qr-${player.number}`), url, { width: 120 });
+    });
+  </script>
+
+</body>
+</html>

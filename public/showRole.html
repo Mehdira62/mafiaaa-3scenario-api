@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>نقش شما</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 80px;
+      direction: rtl;
+    }
+    h1 { font-size: 28px; }
+    #role { font-size: 24px; color: green; margin-top: 20px; }
+    #error { color: red; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>نقش شما در بازی</h1>
+  <div id="role">در حال بارگذاری...</div>
+  <div id="error"></div>
+
+  <script>
+    const qrId = window.location.pathname.split('/').pop(); // گرفتن qrId از URL
+
+    async function fetchRole() {
+      try {
+        // فقط یکبار fetch بزنیم، نه دوبار
+        const res = await fetch(`/api/role/${qrId}`);
+
+        if (!res.ok) {
+          const data = await res.json();
+          document.getElementById("role").style.display = "none";
+          document.getElementById("error").innerText = data.error || "خطایی رخ داده است";
+          return;
+        }
+
+        const data = await res.json();
+        document.getElementById("role").innerText =
+          `بازیکن شماره ${data.playerNumber} - نقش: ${data.role}`;
+      } catch (err) {
+        document.getElementById("role").style.display = "none";
+        document.getElementById("error").innerText = "خطا در اتصال به سرور";
+      }
+    }
+
+    fetchRole();
+  </script>
+</body>
+</html>

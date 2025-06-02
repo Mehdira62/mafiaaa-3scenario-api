@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>انتخاب سناریو بازی مافیا</title>
+  <style>
+    body { font-family: Tahoma, sans-serif; padding: 20px; direction: rtl; }
+    button { margin: 5px; padding: 10px 20px; font-size: 16px; }
+    #result { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>انتخاب سناریو و تعداد بازیکن</h1>
+
+  <div>
+    <label>سناریو: </label>
+    <button data-scenario="capo">کاپو</button>
+    <button data-scenario="bazpars">بازپرس</button>
+    <button data-scenario="namayande">نماینده</button>
+    <button data-scenario="takavar">تکاور</button>
+  </div>
+
+  <div style="margin-top:15px;">
+    <label for="playerCount">تعداد بازیکن (۱۰ تا ۱۵): </label>
+    <input type="number" id="playerCount" min="10" max="15" value="10" />
+  </div>
+
+  <div style="margin-top:15px;">
+    <button id="createGameBtn">ایجاد بازی</button>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    let selectedScenarioId = null;
+
+    // نگه داشتن شناسه سناریو انتخاب شده (اینجا فقط نام انگلیسی برای نمونه)
+    const scenarioMap = {
+      capo: '683c141c20a7780332e36cce',       // شناسه واقعی سناریو کاپو از دیتابیس
+      bazpars: '683c141c20a7780332e36ccf',    // بازپرس
+      namayande: '683c141c20a7780332e36cd0',  // نماینده
+      takavar: '683c141c20a7780332e36cd1'     // تکاور
+    };
+
+    // دکمه‌های سناریو
+    document.querySelectorAll('button[data-scenario]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedScenarioId = scenarioMap[btn.getAttribute('data-scenario')];
+        document.getElementById('result').textContent = `سناریو انتخاب شد: ${btn.textContent}`;
+      });
+    });
+
+    // دکمه ایجاد بازی
+    document.getElementById('createGameBtn').addEventListener('click', () => {
+      const playerCount = parseInt(document.getElementById('playerCount').value);
+      if (!selectedScenarioId) {
+        alert('لطفا یک سناریو انتخاب کنید');
+        return;
+      }
+      if (isNaN(playerCount) || playerCount < 10 || playerCount > 15) {
+        alert('تعداد بازیکن باید بین ۱۰ تا ۱۵ باشد');
+        return;
+      }
+
+      // برای سادگی، نقش‌ها را فرضی می‌گذاریم همه "1"
+      // بعدا باید نقش‌ها با توجه به سناریو و تعداد بازیکن ساخته شود
+      const selected_roles = Array(playerCount).fill("1");
+
+      fetch('http://localhost:5000/api/games', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scenario_id: selectedScenarioId,
+          player_count: playerCount,
+          selected_roles
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.error){
+          document.getElementById('result').textContent = 'خطا: ' + data.error;
+        } else {
+          document.getElementById('result').innerHTML =
+            `بازی ساخته شد!<br>کد بازی: <b>${data.gameId}</b><br>` +
+            `آدرس بازی (QR): <a href="${data.qr_url}" target="_blank">${data.qr_url}</a>`;
+        }
+      })
+      .catch(err => {
+        document.getElementById('result').textContent = 'خطا در ارتباط با سرور';
+      });
+    });
+  </script>
+</body>
+</html>
