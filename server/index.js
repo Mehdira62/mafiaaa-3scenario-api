@@ -4,15 +4,14 @@ const cors = require('cors');
 const gameRoutes = require('./routes/gameRoutes');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;  // پورت رو از متغیر محیطی می‌گیریم
 
-// اتصال به MongoDB
-mongoose.connect('mongodb://localhost:27017/mafia', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('MongoDB connection error:', err));
+// اتصال به MongoDB با متغیر محیطی (اگر تنظیم نشده، آدرس لوکال پیش‌فرض)
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/mafia';
+
+mongoose.connect(mongoURI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 app.use(cors());
 app.use(express.json());
